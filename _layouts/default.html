@@ -14,10 +14,10 @@
       </a>
       <p>{{ site.title }}</p>
     </header>
-    <div class="mw7 bg-white mt4 mb3 center br2-ns bt bb ba-ns b--light-gray">
+    <div class="mw8 bg-white mt4 mb3 center br2-ns bt bb ba-ns b--light-gray" style="max-width: 58rem">
       <nav class="bb b--light-gray pv4 tc" aria-label="Main">
         {% for link in site.links %}
-          <a class="link blue hover-mid-gray mh2 pv1" style="color: #1d5884 !important; font-size: 13px;"
+          <a class="link link-title blue hover-mid-gray mh2 pv1" style="color: #1d5884 !important; font-size: 13px;"
              href="{% unless link.external %}{{ site.url }}{% endunless %}{{ link.url }}">
              {{ link.name }}
            </a>
