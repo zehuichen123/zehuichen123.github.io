@@ -10,21 +10,21 @@
   <body class="lh-copy dark-gray pa0 f6 sans-serif bg-super-white">
     <header class="tc mt4">
       <a href="{{ site.url }}">
-        <img src="{{ site.url }}/images/scribble.png" alt="Home" width="53" height="59">
+        <img src="{{ site.url }}/images/new.jpg" alt="Home" width="70" height="70" style="border-radius:50%;">
       </a>
       <p>{{ site.title }}</p>
     </header>
     <div class="mw7 bg-white mt4 mb3 center br2-ns bt bb ba-ns b--light-gray">
       <nav class="bb b--light-gray pv4 tc" aria-label="Main">
         {% for link in site.links %}
-          <a class="link blue hover-mid-gray mh2 pv1"
+          <a class="link blue hover-mid-gray mh2 pv1" style="color: #1d5884 !important; font-size: 13px;"
              href="{% unless link.external %}{{ site.url }}{% endunless %}{{ link.url }}">
              {{ link.name }}
            </a>
         {% endfor %}
       </nav>
 
-      <main class="tl f6 relative pa4 pa5-ns overflow-hidden">
+      <main class="tl f6 relative pa4 pa5-ns overflow-hidden" style="padding-top: 2rem !important; padding-bottom: 2rem">
         {% if page.title %}
           <div class="mb4">
             {% if page.date %}<div class="fw600 light-silver mt1">{{ page.date | date_to_string }}</div>{% endif %}

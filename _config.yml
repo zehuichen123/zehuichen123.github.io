@@ -1,5 +1,5 @@
 # ----------- CONFIGURABLE START -----------
-title:            "lovesnowbest"
+title:            "Zehui Chen"
 description:      "~"
 url:              https://lovesnowbest.site # Site url, without a slash at the end.
 signoff:          "lovesnowbest" # Your name
@@ -10,10 +10,13 @@ share:            false # Turn on twitter and facebook share buttons
 links:
   - name:         About
     url:          /about
-  - name:         Posts
+  - name:         Blog
     url:          /
-    external:     false
-    external:     false
+  - name:         Friends
+    url:          /friends
+  - name:         Github
+    url:          https://github.com/zehuichen123/
+    external:     true
 # ------------ CONFIGURABLE END ------------
 
 permalink:        /posts/:title
