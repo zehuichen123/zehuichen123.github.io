@@ -1,6 +1,15 @@
 @import "https://unpkg.com/tachyons@4.6.1/css/tachyons.min.css";
 @import url('https://fonts.googleapis.com/css?family=Open+Sans|Source+Serif+Pro&display=swap');
 
+/*body div.content {}
+body div.content code.has-jax {
+    font: inherit;
+    font-size: 100%;
+    background: inherit;
+    border: inherit;
+    color: #000000;
+}*/
+
 .bg-super-white { background: #f9f9f9; }
 .top-50 { top: 50% }
 .link:hover { background: url(/images/line.png) repeat-x left bottom; }
@@ -8,8 +17,20 @@
 .link-title{
   background: url(/images/line.png) repeat-x left bottom;
 }
+.markdown-body h1 h2 h3 h4{
+  font-family: 'Open Sans', serif !important;
+  font-weight: 800 !important;
+}
 
-.markdown-body{
+.markdown-body p{
+  font-family: 'Source Serif Pro', serif;
+  font-size: 16px !important;
+}
+.markdown-body li{
+  font-family: 'Source Serif Pro', serif;
+  font-size: 16px !important;
+}
+.markdown-body ul{
   font-family: 'Source Serif Pro', serif;
   font-size: 16px !important;
 }
@@ -41,3 +62,4 @@
   padding-left: 3.8rem;
 }
 /* end Markdown styles */
+

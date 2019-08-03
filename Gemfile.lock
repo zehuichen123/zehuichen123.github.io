@@ -68,7 +68,7 @@ GEM
       jekyll-titles-from-headings (= 0.5.1)
       jemoji (= 0.10.2)
       kramdown (= 1.17.0)
-      liquid (= 4.0.0)
+      liquid (= 4.0.3)
       listen (= 3.1.5)
       mercenary (~> 0.3)
       minima (= 2.5.0)
@@ -112,6 +112,8 @@ GEM
       commonmarker (~> 0.17.6)
       jekyll-commonmark (~> 1)
       rouge (~> 2)
+    jekyll-compose (0.11.0)
+      jekyll (>= 3.7, < 5.0)
     jekyll-default-layout (0.1.4)
       jekyll (~> 3.0)
     jekyll-feed (0.11.0)
@@ -243,6 +245,7 @@ PLATFORMS
 
 DEPENDENCIES
   github-pages
+  jekyll-compose
 
 BUNDLED WITH
    2.0.2

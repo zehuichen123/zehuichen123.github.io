@@ -6,6 +6,14 @@
     <meta content='{{ page.title }} - {{ site.title }}' name='og:title' />
     <title>{{ page.title }} - {{ site.title }}</title>
     {% include head.html %}
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+          inlineMath: [['$','$']]
+        }
+      });
+    </script> <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML' async></script>
   </head>
   <body class="lh-copy dark-gray pa0 f6 sans-serif bg-super-white">
     <header class="tc mt4">
@@ -14,7 +22,7 @@
       </a>
       <p>{{ site.title }}</p>
     </header>
-    <div class="mw8 bg-white mt4 mb3 center br2-ns bt bb ba-ns b--light-gray" style="max-width: 58rem">
+    <div class="mw8 bg-white mt4 mb3 center br2-ns bt bb ba-ns b--light-gray" style="max-width: 59rem">
       <nav class="bb b--light-gray pv4 tc" aria-label="Main">
         {% for link in site.links %}
           <a class="link link-title blue hover-mid-gray mh2 pv1" style="color: #1d5884 !important; font-size: 13px;"
