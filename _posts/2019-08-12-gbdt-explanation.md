@@ -1,6 +1,6 @@
 ---
 layout: default
-title: GBDT Explanation
+title: Gradient Boosting Decision Tree Explanation
 date: 2019-08-12 13:12 +0800
 ---
 
@@ -40,7 +40,6 @@ Then we utilize GBDT to learn this task, and we limit the maximum number of node
 
 <center><img src="/images/gbdt/gbdt.png"></center>
 <center><i>An illustraction of an GBDT.</i></center>
-
 Note that in the second tree, it not learn the value of 14, 16, 24, 26 but the residual value from the previous base learners.
 
 ---

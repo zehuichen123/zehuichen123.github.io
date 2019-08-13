@@ -1,6 +1,6 @@
 ---
 layout: default
-title: Segmentation Related
+title: Segmentation Related Models and Loss
 date: 2019-08-09 13:43 +0800
 ---
 
