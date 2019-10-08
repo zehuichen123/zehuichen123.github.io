@@ -76,6 +76,143 @@ You have to remember one sentence and that's enough:
 
 ## Chapter 2 Parallel based on Threading
 
+考虑到Python目前我需要用到的加速都是基于进程的，打算跳过这章，先学第三章，以后有空再回来学这章。至于为啥嘞，首先Python有GIL，所以不论你开几个线程，默认Python都只会占用一个核，可是我们现在基本上都是多核处理器了，所以想要提高效率就要增加每个CPU的使用率。其次，线程相对于进程的一个比较大的优势就是它的上下文切换速度比进程快，但是实际上利用多个CPU并行的提升远远大于上下文切换的代价~没错 我就是这么功利：）
+
+## Chapter 3 Parallel based on Process
+
+### 1. Intro
+
+In this chapter, we will mainly cover about `multiprocessing` and `mp4py` module in Python library.
+
+`multiprocessing` implements the shared memory mechanism which enables processors to access shared memory.
+
+`mp4py` implements message passing mechanism (design pattern) which enables processes messages without sharing anything. All information are passed through messages.
+
+Here is one example code
+
+```python
+from multiprocessing import Pool
+def f(x):
+  return x * x
+p = Pool(5)
+p.map(f, [1, 2, 3])
+
+>>output: [1, 4, 9]
+```
+
+The author(maybe translator) mentioned that function f should be declared out of this file and called as one module. However, that's not necessary. What you need to do is to define function `f` before you declare process pool, like what I wrote above.
+
+### 2. How to generate one process?
+
+Spawn means generate, which refers to the generation of son process by its father process. These process can be executed asynchronous or synchronous. The following code shows how can we create processes:
+
+```python
+import multiprocessing
+def foo(i):
+  print("called function in process: %s" % i)
+  return
+if __name__ == '__main__':
+  process_jobs = []
+  for i in range(5):
+    p = multiprocessing.Process(target=foo, args=(i,))
+    process_jobs.append(p)
+    p.start()
+    p.join()
+```
+
+`start` means start this process and `join` means wait until the process finished.
+
+If you forget to call `join` method, the process will not be freed, even if the main process ends.
+
+### 3. How to name one process
+
+Omitted... No use for now
+
+### 4. How to run process in the background
+
+Set the **daemon** to be True.
+
+```python
+import multiprocessing
+import time
+
+def foo():
+  name = multiprocessing.current_process().name
+  print("Starting>", name)
+  time.sleep(3)
+  print("Exiting %s"% name)
+  
+if __name__ == '__main__':
+  bg_process = multiprocessing.Process(name='bg_process', target=foo)
+  bg_process.daemon = True
+  NO_bg_process = multiprocessing.Process(name='NO_bg_process', target=foo)
+  NO_bg_process.daemon = False
+  bg_process.start()
+  NO_bg_process.start()
+```
+
+background process is not allowed to new more son process. Otherwise, its child process may become orphan process when background process exit along with its father process.
+
+### 5. How to terminate process
+
+```python
+import multiprocessing
+import time
+def foo():
+  print('Starting function')
+  time.sleep(0.1)
+  print('Finished function')
+if __name__ == '__main__':
+  p = multiprocessing.Process(target=foo)
+  p.start()
+  p.terminate()
+  p.join()
+```
+
+### 7. How to exchange object within processes
+
+```python
+import multiprocessing
+import time
+import random
+
+class Producer(multiprocessing.Process):
+  def __init__(self, queue):
+    super().__init__()
+    self.queue = queue
+  def run(self):
+    for i in range(10):
+      item = random.randint(0, 256)
+      self.queue.put(item)
+      print("Process Producer : item %d appended to queue %s" % (item, self.name))
+      time.sleep(1)
+      print("The size of queue is %s" % self.queue.qsize())
+class Consumer(multiprocessing.Process):
+  def __init__(self, queue):
+    multiprocessing.Process.__init__(self)
+    self.queue = queue
+  def run(self):
+    while True:
+      if self.queue.empty():
+        print("the queue is empty")
+        break
+      else:
+        time.sleep(2)
+        item = self.queue.get()
+        print('Process Consumer : item %d popped from by %s \n' % (item,self.name))
+        time.sleep(1)
+if __name__ == '__main__':
+  queue = multiprocessing.Queue()
+  process_producer = Producer(queue)
+  process_consumer = Consumer(queue)
+  process_producer.start()
+  process_consumer.start()
+  process_producer.join()
+  process_consumer.join()
+```
+
+
+
 ## Reference
 
 [1] <a href="https://python-parallel-programmning-cookbook.readthedocs.io/zh_CN/latest/index.html">Python并行编程 中文版</a>
