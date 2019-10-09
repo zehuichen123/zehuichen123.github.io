@@ -211,6 +211,321 @@ if __name__ == '__main__':
   process_consumer.join()
 ```
 
+### 8. How to synchronize processes
+
+When sharing data among processes, one need to take the responsibility to garentee that data is consistant. Here are some tips:
+
+- Lock, for each `Lock` class, it holds two methods: `acquire()` and `release()` to control the rights to read/write.
+- Event, to implement simple messages between processes. One process sends the signal and the other waits the signal. (`set()` and `clear()`)
+- Condition, `wait()` and `notify_all()`
+- Semaphore
+- Rlock
+- Barrier, to limit the processing order of processes
+
+Here is an example on how to utilize `barrier` to synchronize two processes.
+
+```python
+import multiprocessing
+from multiprocessing import Barrier, Lock, Process
+from time import time
+from datetime import datetime
+
+def test_with_barrier(synchronizer, serializer):
+  name = multiprocessing.current_process().name
+  synchronizer.wait()
+  now = time()
+  with serializer:
+    print("process %s ---> %s"%(name, datetime.fromtimestamp(now)))
+def test_without_barrier():
+  name = multiprocessing.current_process().name
+  now = time()
+  print("process %s ---> %s"%(name, datetime.fromtimestamp(now)))
+  
+if __name__ == '__main__':
+  synchronizer = Barrier(2)
+  serializer = Lock()
+  Process(name='p1-test_with_barrier', target=test_with_barrier, args=(synchronizer, serializer)).start()
+  Process(name='p2-test_with_barrier', target=test_with_barrier, args=(synchronizer, serializer)).start()
+  Process(name='p3-test_without_barrier', target=test_without_barrier).start()
+  Process(name='p4-test_without_barrier', target=test_without_barrier).start()
+```
+
+### 9. A simple way to share data among processes-- Manager!
+
+When you new a manager, it can hold what you want and allows different processes to access it. 
+
+```python
+import multiprocessing
+def worker(dictionary, key, item):
+  dictionary[key] = item
+  print("key = %d value = %d"%(key, item))
+  
+if __name__ == "__main__":
+  mgr = multiprocessing.Manager()
+  dictionary = mgr.dict()
+  jobs = [multiprocessing.Process(target=worker, args=(dictionary, i, i*2)) for i in range(7)]
+  for j in jobs:
+    j.start()
+  for j in jobs:
+    j.join()
+  print("Results", dictionary)
+```
+
+### 10. How to use ProcessPool
+
+- `apply()`: block until getting result
+- `apply_async()`: the return value is an object, and it's a asynchronous operation, which means, the main process will continue until all child processes start processing.
+- `map()`: it can receive iteratable data and process functions in parallel.
+- `map_async()`: omit
+
+```python
+import multiprocessing
+def function_square(data):
+  result = data**2
+  return result
+
+if __name__ == '__main__':
+  inputs = list(range(100))
+  pool = multiprocessing.Pool(processes=4)
+  pool_outputs = pool.map(function_square, inputs)
+  pool.close()
+  pool.join()
+```
+
+由于MPI4Py在mac上好像装不上，而且我可能用不到，就又跳了。。。第三章结束～
+
+## Chapter 4 Asynchronous Programming
+
+### 1. Use `concurrent.futures` Module
+
+This module consists of:
+
+- `Concurrent.futures.Executor`, which is a virtual base class, and provides the method to execute asynchronize.
+- `submit(function, argument)`
+- `map(function, augment)`
+- `shutdown(Wait=True)`
+
+```python
+import concurrent.futures
+import time
+
+num_list = [1, 2, 3, 4, 5, 6]
+def evaluate_item(x):
+  res = count(x)
+  return result_item
+
+def count(num):
+  for i in range(0, 1000000):
+    i += 1
+  return i * number
+
+if __name__ == "__main__":
+  start_time = time.time()
+  for item in num_list:
+    print(evaluate_item(item))
+    
+  with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
+    futures = [executor.submit(evaluate_item, item) for item in num_list]
+    for future in concurrent.futures.as_complete(futures):
+      print(future.result())
+      
+  with concurrent.futures.ProcessPoolExecutor(max_workers=5) as executor:
+    futures = [executor.submit(evaluate_item, item) for item in num_list]
+    for future in concurrent.futures.as_complete(futures):
+      print(future.result())
+```
+
+The above code implements how to utilize `ThreadPoolExecutor` and `ProcessPoolExecutor`.
+
+### 2. Use `Asyncio` to manage events loop
+
+`Asyncio` consists of 
+
+- Events Loop, so each process owns their own event loop
+- Coroutine(协程) is the general concepts of child process. It can be paused during processing, so that it can wait until something finished
+- Futures, represents for unfinished computation
+- Tasks, the child class of `Asyncio`
+
+The first question is what is event loop?
+
+During the process of the program, it continously trace the order of events and put them into the queue.
+
+```python
+while(1){
+  events = getEvents();
+  for (e in events):
+  	processEvent(e);
+}
+```
+
+Here is an example code
+
+```python
+import asyncio
+import datetime
+import time
+
+def func_1(end_time, loop):
+    print("Func1 called")
+    if (loop.time() + 1.) < end_time:
+        loop.call_later(1, func_2, end_time, loop)
+    else:
+        loop.stop()
+
+def func_2(end_time, loop):
+    print("Func2 called")
+    if (loop.time() + 1.) < end_time:
+        loop.call_later(1, func_3, end_time, loop)
+    else:
+        loop.stop()
+
+def func_3(end_time, loop):
+    print("Func3 called")
+    if (loop.time() + 1.) < end_time:
+        loop.call_later(1, func_1, end_time, loop)
+    else:
+        loop.stop()
+
+def func_4(end_time, loop):
+    print("Func4 called")
+    if (loop.time() + 1.) < end_time:
+        loop.call_later(1, func_4, end_time, loop)
+    else:
+        loop.stop()
+
+loop = asyncio.get_event_loop()
+
+end_loop = loop.time() + 9.
+loop.call_soon(func_1, end_loop, loop)
+loop.run_forever()
+loop.close()
+```
+
+### Use `Asyncio` to manage Coroutines
+
+Before we start this lesson, you need to know what is **Coroutines**. Actually, coroutine is something like child function. The difference between child function and coroutine is that child function needs to be called by the main process while coroutines executed by themselves and they are connected by channels.
+
+```python
+import asyncio
+
+@asyncio.coroutine
+def coroutine_func(func_arguments):
+  # Do Something
+```
+
+Let's see how to simulate finite state machine through coroutines:
+
+```python
+import asyncio
+from random import randint
+import time
+
+@asyncio.coroutine
+def StartState():
+    print("Start State called \n")
+    input_value = randint(0, 1)
+    time.sleep(1)
+    if (input_value == 0):
+        result = yield from State2(input_value)
+    else:
+        result = yield from State1(input_value)
+    print("Resume of the Transition : \nStart State calling " + result)
+
+@asyncio.coroutine
+def State1(transition_value):
+    outputValue =  str("State 1 with transition value = %s \n" % transition_value)
+    input_value = randint(0, 1)
+    time.sleep(1)
+    print("...Evaluating...")
+    if input_value == 0:
+        result = yield from State3(input_value)
+    else :
+        result = yield from State2(input_value)
+    result = "State 1 calling " + result
+    return outputValue + str(result)
+
+@asyncio.coroutine
+def State2(transition_value):
+    outputValue =  str("State 2 with transition value = %s \n" % transition_value)
+    input_value = randint(0, 1)
+    time.sleep(1)
+    print("...Evaluating...")
+    if (input_value == 0):
+        result = yield from State1(input_value)
+    else :
+        result = yield from State3(input_value)
+    result = "State 2 calling " + result
+    return outputValue + str(result)
+
+@asyncio.coroutine
+def State3(transition_value):
+    outputValue = str("State 3 with transition value = %s \n" % transition_value)
+    input_value = randint(0, 1)
+    time.sleep(1)
+    print("...Evaluating...")
+    if (input_value == 0):
+        result = yield from State1(input_value)
+    else :
+        result = yield from EndState(input_value)
+    result = "State 3 calling " + result
+    return outputValue + str(result)
+
+@asyncio.coroutine
+def EndState(transition_value):
+    outputValue = str("End state with transition value = %s \n" % transition_value)
+    print("Stop computation...")
+    return outputValue
+
+loop = asyncio.get_event_loop()
+loop.run_until_complete(StartState())
+```
+
+Something like DFS actually hhh.
+
+### Use `Asyncio` to control Tasks
+
+```python
+import asyncio
+
+@asyncio.coroutine
+def factorial(num):
+    f = 1
+    for i in range(2, num + 1):
+        print("Asyncio.Task: Compute factorial(%s)"%(i))
+        yield from asyncio.sleep(1)
+        f *= i
+    print("Asyncio Task - factorial(%s) = %s"%(num, f))
+
+@asyncio.coroutine
+def fibonacci(num):
+    a, b = 0, 1
+    for i in range(num):
+        print("Asyncio Task: Compute Fib (%s)"%(i))
+        yield from asyncio.sleep(1)
+        a, b = b, a + b
+    print("Asyncio Task - fib(%s) = %s"%(num, a))
+
+@asyncio.coroutine
+def binomialCoeff(n, k):
+    result = 1
+    for i in range(1, k+1):
+        result = result * (n-i+1) / i
+        print("Asyncio Task: Compute binomialCoeff (%s)"%(i))
+        yield from asyncio.sleep(1)
+    print("Asyncio Task - binomialCoeff(%s, %s) = %s"%(n, k, result))
+
+tasks = [asyncio.Task(factorial(10)),
+         asyncio.Task(fibonacci(10)),
+         asyncio.Task(binomialCoeff(20, 10))]
+loop = asyncio.get_event_loop()
+loop.run_until_complete(asyncio.wait(tasks))
+loop.close()
+```
+
+So you can view this program as something that an execute line skip among three functions(actually coroutines). When we called `yield`, we will move to the next task.
+
+And if you don't call `yield`, you may find these tasks are executed one by one orderly.
+
 
 
 ## Reference
