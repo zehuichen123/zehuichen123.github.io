@@ -4,6 +4,19 @@ title: Relearning Tabular Data Competition--Kaggle IEEE Fraud Detection
 date: 2019-10-13 13:43 +0800
 ---
 
+> Content of this article
+>
+> - Intro
+> - Main Section
+>   - Identity Clients, to find magic UID
+>   - Validation strategies 
+>   - Quick visualization of feature importance
+>   - Feature Engineering
+>     - Feature Generation
+>     - Feature Selection -- Time consistency
+>   - Speed and Memory Optimization
+> - Summary
+
 ## Intro
 
 With the help of my friend Mono(actually he managed all stuffs at the last period of competition), I got my first bronze medal in Kaggle. In order to get better rankings next time, I decide to revisiting this competition and dive deeper to learn those tricks and insights behind tabular data competition. Most of them comes from kernels/ discussions published by those top  winners in this competition. 
@@ -149,3 +162,16 @@ Apart from adverserial validation to find strongly time-related features, we pro
 - Loading data with pickle format can be faster than csv format about 60 times in this dataset.
 - Downcasting type for some of data to reduce your memory usage.
 
+## Summary
+
+I am looking forward to next tabular data competition, haha!
+
+## Reference
+
+[1] [xgb-fraud-with-magic-0-9600, kaggle kernel](https://www.kaggle.com/cdeotte/xgb-fraud-with-magic-0-9600)
+
+[2] [How to Find UIDs - (Unique Identification), kaggle discussion](https://www.kaggle.com/c/ieee-fraud-detection/discussion/111510)
+
+[3] [1st Place Solution - Part 1, kaggle discussion](https://www.kaggle.com/c/ieee-fraud-detection/discussion/111284#latest-647701)
+
+[4] [1st Place Solution - Part 2, kaggle discussion](https://www.kaggle.com/c/ieee-fraud-detection/discussion/111308)
