@@ -17,6 +17,8 @@ links:
   - name:         Github
     url:          https://github.com/zehuichen123/
     external:     true
+  - name:         Aileen
+    url:          /aileen
 # ------------ CONFIGURABLE END ------------
 
 permalink:        /posts/:title
