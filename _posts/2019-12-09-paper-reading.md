@@ -4,11 +4,27 @@ title: Object Detection Paper Reading
 date: 2019-12-09 15:27 +0800
 ---
 
+目录：
+
+1. Bridging the Gap between Anchor-based and Anchor-free Detection via Adaptive Training Sample Selection
+2. Shape-aware Feature Extraction for Instance Segmentation
+3. Region Proposal by Guided Anchoring
+4. Feature Selective Anchor-Free Module for Single-Shot Object Detection
+5. RDSNet: A New Deep Architecture for Reciprocal Object Detection and Instance Segmentation
+6. Revisiting Feature Alignment for One-stage Object Detection
+7. RepPoints: Point Set Representation for Object Detection
+8. Is Sampling Heuristics Necessary in Training Deep Object Detectors?
+9. Multiple Anchor Learning for Visual Object Detection
+10. Learning from Noisy Anchors for One-Stage Object Detection
+11. Gaussian YOLOv3: An Accurate and Fast Object Detector Using Localization Uncertainty for Autonomous Driving
+12. Bounding Box Regression with Uncertainty for Accurate Object Detection
+13. HAMBox: Delving into Online High-quality Anchors Mining for Detecting Outer Faces
+
 ## Bridging the Gap between Anchor-based and Anchor-free Detection via Adaptive Training Sample Selection
 
 这篇文章主要argue的一个点就是其实anchor-based和anchor-free本质上是没啥区别的，当然有一个前提条件，就是how to define positive and negative training samples。
 
-这篇文章给了一个实验，也就是RetinaNet和FCOS的先导试验，就是它先把FCOS上的东西基本上都加到RetinaNet上，结果从32.5涨到了37.0。然后现在的RetinaNet和FCOS只有两个区别，一个是如何生成训练样本，一个是是否p redefine anchor。然后当作者把RetinaNet的sampling methods从IoU-based改成Spatial and scale constraints后，FCOS和RetinaNet的表现结果一致了。这就表明其实有没有anchor是不重要的，你从点开始回归还是从框回归，最后并不影响。我觉得这个点发现的挺有意思的。
+这篇文章给了一个实验，也就是RetinaNet和FCOS的先导试验，就是它先把FCOS上的东西基本上都加到RetinaNet上，结果从32.5涨到了37.0。然后现在的RetinaNet和FCOS只有两个区别，一个是如何生成训练样本，一个是是否predefine anchor。然后当作者把RetinaNet的sampling methods从IoU-based改成Spatial and scale constraints后，FCOS和RetinaNet的表现结果一致了。这就表明其实有没有anchor是不重要的，你从点开始回归还是从框回归，最后并不影响。我觉得这个点发现的挺有意思的。
 
 然后就是作者提出的ATSS了，具体想法就是先找到所有level的possible candidates的positive，然后计算他们与GT的IOU，接着计算mean和var得到对应IoU threshold。最后select对应满足条件的anchor。结果还是挺感人的，retina涨了2个点左右，FCOS涨了一个点多。
 
@@ -137,7 +153,24 @@ $$ L_{reg} \propto \frac{(x_g - x_e)^2}{2\sigma^2} + \frac{1}{2}\text{log}(\sigm
 这张图是每条边预测的var与对应边和GT的差值的图，这里只取IoU大于0.5的作图，不然几乎看不到线性关系= = 由于我们推出来的var实际上是在学GT与预测值差值的绝对值，所以我们期望最后学出来的diff与var应该是符合线性关系，也就是应该比较均匀的分布在红线周围，但实际上模型学出来的var overestimate了，也就是说，即使diff很小，网络依然可能会预测出较大的var，这也是为啥只取了大于0.5的作图，不然scatter的点可能会覆盖整个x轴...
 
 <center><img src="/images/paper2020_1/res152_iou_proposal.png" height="500"></center>
-这张图是我今天看到Gaussian YoloV3那篇文章里面画的图所以想画张一样的看看效果。的确惨目忍睹啊...在低IoU的框中，网络预测出的var打了个折，那应该是咋样呢？看下别人Gaussian YoloV3里面的图就知道了...
+这张图是我今天看到Gaussian YoloV3那篇文章里面画的图所以想画张一样的看看效果。的确惨目忍睹啊...在低IoU的框中，网络预测出的var打了个折，那应该是咋样呢？看下别人Gaussian YoloV3里面的图就知道了...不过后来想了一下，值得注意的是，如果IoU都已经低于0.5了，那么我们还应该把这种prediction看成是与该GT匹配的框吗？同时对于IoU小于0.5的框我们是不train的，所以出现这种情况也是合理的吧
 
 <center><img src="/images/paper2020_1/gaussianyolo.png" height="400"></center>
 感觉KL Loss学的还是不够好啊...最近在考虑要不要试一波他这个NLL，看起来还是比KL强点...
+
+## HAMBox: Delving into Online High-quality Anchors Mining for Detecting Outer Faces
+
+话说好久没怎么写reading notes，不过最近看的paper感觉都没有看到啥比较有insight的paper，倒是这篇HAMBox挺有意思的，准备写一下。
+
+首先这篇文章是关于anchor label assign的，哈哈哈，是不是想到了之前看的那篇Learning from noisy labels for object detection？不过这两篇的确有着相似之处，比如说都是用anchor与GT的IoU来加权Regression分支。这点其实我之前也试过，Faster R-CNN用proposal与GT的iou加权RCNN的回归分支，好像能够在COCO涨个0.2～0.3个点左右，不过这个涨幅感觉不够大啊，倒是Davis组的那篇同时考虑了cls score与IoU融合的加权好像能涨更多。
+
+其实这篇文章主要的贡献当然不是那个focal loss for regression，实际上是说的是label assign的问题。在之前那篇文章中，作者提出用cleanliness score来加权classification分支的训练，提出了一种类似于focal loss的损失函数。这篇文章并非直接用loss入手，而是从给的数据集样本分布入手，人为加入anchor（或者更准确的说动态更新IoU阈值assign anchor的label，说到这又让我想到了ATSS 哈哈哈，ATSS是使用anchor计算分布来动态assign。啊哈，突然感觉这三篇文章都在研究一个问题！准备改天写个仔细点的文章分析一下这三个东西的共同点和区别，ATSS都是在去年12月看的了....）
+
+当然，这篇文章有几个验证实验，最有说服力的我觉得是下面两幅图
+<center><img src="/images/paper2020_3/ham_iou.png" width="300"></center>
+<center><img src="/images/paper2020_3/ham_anchor.png" width="300"></center>
+首先解释一下high quality anchors的意思是指最后通过回归结果与GT 的IoU大于0.5的anchor。那么图一的意思就是anchor小于IoU多少时，能够产生的正确检测框比例。从图中可以看到那些IoU小于0.35的anchor检测框们能够在最后产生占到89%的正确检测框。当然这张图是inference的时候，而在train的时候，这个比例也是占到了65%（训练结束时差不多70%）。可以看到实际上我们很多的正确检测框来自于我们被设置为负标签的样本。那么这么做会不会又影响呢？当然会咯，那么我们就可以看第二张图，这张图画的是真的难看懂...😒 首先解释几个词语：CPBB是corrected predicted bounding box，横坐标是每张脸（GT）match到的anchor的数目，纵坐标是被match到对应anchor数目的人脸（GT）有多少个。所以红色可以解释为，被match到对应anchor数目的脸有多少张，蓝色可以解释为被match到对应CPBB数目的人脸又多少张，绿色就是CPBB NMS之后的。那么可以发现每个人脸被assign到的anchor越多，结果也就越好，对应的蓝色就越多。然后重点来了，在NMS之后，被match到对应CPBB的人脸数目都显著下降了！为啥？如果我们NMS掉的是同样的框，那么绿色应该不会比蓝色低多少才对。真相只有一个，那就是其实我们NMS掉了之前找出来的框，但是由于分太低被remove掉了，所以就出现了大量漏检。所以说我们assign负标签给这些本来正确的样本还是有影响的哇！
+
+其实这个点发现很有意思，解决方法也不难，就是在train的过程中，动态计算每个gt周围的anchor数目label，给对应的high quality anchor重新assign label。做法的话懒得写了，其实也是根据对应阈值对每个GT找top-k个positive anchor（前提是有），这个positive anchor的定义是从最后回归的结果定义的，而非通过一开始的IoU predefined。这样就能够避免之前说到的high quality anchor被分类为negative samples的问题啦～
+
+不过说到这里，这篇文章一直说的是one stage，那么two stage是否存在这个问题呢？那RPN是不是也应该来一波这个说不定能够比Cascade RPN涨更多呢哈哈哈哈
