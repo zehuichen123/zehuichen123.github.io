@@ -19,6 +19,8 @@ date: 2019-12-09 15:27 +0800
 11. Gaussian YOLOv3: An Accurate and Fast Object Detector Using Localization Uncertainty for Autonomous Driving
 12. Bounding Box Regression with Uncertainty for Accurate Object Detection
 13. HAMBox: Delving into Online High-quality Anchors Mining for Detecting Outer Faces
+14. Revisiting the Sibling Head in Object Detector
+15. Rethinking Classifcation and Localization for Object Detection
 
 ## Bridging the Gap between Anchor-based and Anchor-free Detection via Adaptive Training Sample Selection
 
@@ -174,3 +176,22 @@ $$ L_{reg} \propto \frac{(x_g - x_e)^2}{2\sigma^2} + \frac{1}{2}\text{log}(\sigm
 其实这个点发现很有意思，解决方法也不难，就是在train的过程中，动态计算每个gt周围的anchor数目label，给对应的high quality anchor重新assign label。做法的话懒得写了，其实也是根据对应阈值对每个GT找top-k个positive anchor（前提是有），这个positive anchor的定义是从最后回归的结果定义的，而非通过一开始的IoU predefined。这样就能够避免之前说到的high quality anchor被分类为negative samples的问题啦～
 
 不过说到这里，这篇文章一直说的是one stage，那么two stage是否存在这个问题呢？那RPN是不是也应该来一波这个说不定能够比Cascade RPN涨更多呢哈哈哈哈
+
+## Revisiting the Sibling Head in Object Detector(TSD)
+
+## &&
+
+## Rethinking Classification and Localization for Object Detection(Double Head)
+
+这两篇说的都是一件事情 但是做法略微有些区别 有些殊途同归的味道
+
+首先出发点都是 回归和分类是两件事情 这两件事情需要解耦 为什么呢 因为分类注重的是 图片中的某些具有discriminative的feature，或者说全局的信息，而回归更注重边界信息，即我需要回归到哪个位置。
+
+好啦，出发点说完了，Double Head的做法可以概括为 分类two fc, 回归4conv。为什么这么说呢，还是从出发点来的，分类需要全局信息，所以用fc，它flatten了；回归需要局部信息，用conv这种局部的op。
+
+TSD的做法就比较麻烦一点，首先它有一个shared proposal，就是正常的proposal，然后这个proposal会通过不同的操作提供一个regression用的proposal和一个classfication 用的proposal。这里引入两个概念，pixel-wise offset和proposal-wise offset。pixel wise offset有点像deformable，即proposal上每个点都会有一个offset，这个offset加上原来的坐标是这个点最后取到的特征。而proposal wise offset其实就是所有点都共享一个offset，相当给定proposal xyxy去align feature的时候 把xyxy都加一个offset。然后TSD对regression head用proposal wise的offset生成新proposal，对classification head用pixel wise的offset生成proposal，然后对应head过FC就完事啦～
+
+当然除此之外，两者都提到如果保留原有的sibling head也会给结果带来一定程度上的提高。不过两个用的方式也存在区别，Double Head是把这两个head上的做ensemble，比较憨批...TSD就比较优雅，提出了Progressive constraint，有点像是consistency的东西，可能为了防止offset回归的太过火了叭，所以从loss function上限制了offset，即保证TSD Head与原有head的IoU或者cls score不能差过一定margin，不然就惩罚这个margin...不过涨点也是有的，所以也不是为了凑数搞出来的...
+
+
+
