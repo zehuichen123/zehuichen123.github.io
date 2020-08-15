@@ -1,5 +1,5 @@
 ---
-layout: post
+layout: default
 title: Label Assignment in Object Detection
 date: 2020-04-24 18:32 +0800
 ---

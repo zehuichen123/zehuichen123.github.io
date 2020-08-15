@@ -1,0 +1,649 @@
+
+<!doctype>
+<html lang="en">
+  <head>
+    <meta content='Python Parallel Programming - Zehui Chen' name='title' />
+    <meta content='Python Parallel Programming - Zehui Chen' name='og:title' />
+    <title>Python Parallel Programming - Zehui Chen</title>
+    <link href='http://localhost:4000/images/fav.png' rel='shortcut icon'>
+<link href='http://localhost:4000/stylesheets/style.css' rel='stylesheet' type='text/css' />
+<link href='http://localhost:4000/stylesheets/syntax.css' rel='stylesheet' type='text/css' />
+
+<meta content='width=device-width, initial-scale=1.0, user-scalable=no' name='viewport'>
+<meta content='text/html; charset=utf-8' http-equiv='content-type' />
+
+  <meta content='http://localhost:4000/posts/python-parallel-programming' property='og:url' />
+  <meta content="Chapter 1 Intro to Python and Parallel Computing1. Computer system frameworkSISD(I=instruction, D=data), SIMD, MISD, ..." property='og:description' />
+  <meta content="article" property="og:type" />
+
+<!-- - -->
+
+
+
+
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+          inlineMath: [['$','$']]
+        }
+      });
+    </script> <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML' async></script>
+  </head>
+  <body class="lh-copy dark-gray pa0 f6 sans-serif bg-super-white">
+    <header class="tc mt4">
+      <a href="http://localhost:4000">
+        <img src="http://localhost:4000/images/new.jpg" alt="Home" width="70" height="70" style="border-radius:50%;">
+      </a>
+      <p>Zehui Chen</p>
+    </header>
+    <div class="mw8 bg-white mt4 mb3 center br2-ns bt bb ba-ns b--light-gray" style="max-width: 59rem">
+      <nav class="bb b--light-gray pv4 tc" aria-label="Main">
+        
+          <a class="link link-title blue hover-mid-gray mh2 pv1" style="color: #1d5884 !important; font-size: 13px;"
+             href="http://localhost:4000/about">
+             About
+           </a>
+        
+          <a class="link link-title blue hover-mid-gray mh2 pv1" style="color: #1d5884 !important; font-size: 13px;"
+             href="http://localhost:4000/">
+             Blog
+           </a>
+        
+          <a class="link link-title blue hover-mid-gray mh2 pv1" style="color: #1d5884 !important; font-size: 13px;"
+             href="http://localhost:4000/friends">
+             Friends
+           </a>
+        
+          <a class="link link-title blue hover-mid-gray mh2 pv1" style="color: #1d5884 !important; font-size: 13px;"
+             href="https://github.com/zehuichen123/">
+             Github
+           </a>
+        
+          <a class="link link-title blue hover-mid-gray mh2 pv1" style="color: #1d5884 !important; font-size: 13px;"
+             href="https://drive.google.com/file/d/1KuLvfYPDnHv6cTE2BvoeSg9xbtK7TA2Q/view">
+             Resume
+           </a>
+        
+      </nav>
+
+      <main class="tl f6 relative pa4 pa5-ns overflow-hidden" style="padding-top: 2rem !important; padding-bottom: 2rem">
+        
+          <div class="mb4">
+            <div class="fw600 light-silver mt1">07 Oct 2019</div>
+            <h1 class="ttu f3 mt0 lh-title cb mb2">
+              
+              Python Parallel Programming
+            </h1>
+            
+              <!-- <a href="https://twitter.com/share" class="twitter-share-button">Tweet</a>
+              <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+              <div class="fb-like" data-send="false" data-layout="button_count" data-width="100" data-show-faces="false" data-font="arial" data-action="like"></div> -->
+              <!-- Go to www.addthis.com/dashboard to customize your tools --> <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5a57a2d5807d68ea"></script>
+            
+          </div>
+        
+        <div class="markdown-body">
+          <h2 id="chapter-1-intro-to-python-and-parallel-computing">Chapter 1 Intro to Python and Parallel Computing</h2>
+
+<h3 id="1-computer-system-framework">1. Computer system framework</h3>
+
+<p>SISD(I=instruction, D=data), SIMD, MISD, MIMD</p>
+
+<h3 id="2-memory-management">2. Memory Management</h3>
+
+<p>The way to get data, in other words, the time of processor to access memory data.</p>
+
+<p>Actually, there are two different categories:</p>
+
+<ul>
+  <li>Shared Memory</li>
+  <li>Distrbuted Memory</li>
+</ul>
+
+<h4 id="shared-memory">Shared Memory</h4>
+
+<p>All processors share the same logic memory address.</p>
+
+<p>There are actually 4 ways to <strong>access memory</strong> under shared memory framework:</p>
+
+<ul>
+  <li>UMA(uniform memory access)</li>
+  <li>NUMA(non-uniform memory access), it can be divided into high speed memory access area and low speed memory access area. (local cache may refer to high speed)</li>
+  <li>NORMA(no remote memory access), only has local cache. To access other memory, one need to communicate with other processors.</li>
+  <li>COMA(cache only memory access)</li>
+</ul>
+
+<h4 id="distributed-memory">Distributed Memory</h4>
+
+<p>Each processor has its own physical memory and own logic memory address, they are individual.</p>
+
+<p>We may mention some applications of distributed memory.</p>
+
+<ul>
+  <li>MPP(massively parallel processing)</li>
+  <li>Cluster(fail-over cluster, load balancing cluster, high-performance cluster)</li>
+</ul>
+
+<p><strong>Heterogeneous architecture</strong>, CPU manipulates tasks and split the original work into several single and highly-parallel tasks and assigns them to GPU for high speed processing.</p>
+
+<h3 id="3-parallel-programming-model">3. Parallel Programming Model</h3>
+
+<ul>
+  <li>Shared Memory Model, all processors shared one memory. Computer utilizes locks and signal to control conflicts on read and write.</li>
+  <li>Multi-threading Model, one processor can have multiple tasks concurrently. Actually, this is implemented through time slice.</li>
+  <li>Message Passing Model, widely used in distributed memory system.</li>
+  <li>Data-Parallel Model, one need to specify the assignment of data and their alignment.</li>
+</ul>
+
+<h3 id="4-how-to-design-parallel-program">4. How to design parallel program</h3>
+
+<ul>
+  <li><strong>Tasks decomposition</strong>
+    <ul>
+      <li>Domain Level, data may be decomposed. Maybe like the data-parallel model, IMO.</li>
+      <li>Functional Level, split the task into smaller one.</li>
+    </ul>
+  </li>
+  <li><strong>Tasks Assignment</strong>
+    <ul>
+      <li><strong>Load balancing</strong></li>
+      <li>Messaging between processors</li>
+    </ul>
+  </li>
+  <li><strong>Polymerization</strong>(聚合), in order to reduce the cost of messaging between each processor.</li>
+  <li><strong>Mapping</strong>, assign different tasks to different processors, for instance, the tasks which need to message frequently may be assigned to one processor to improve locality.</li>
+  <li><strong>Dynamic Mapping</strong>, some local mapping algorithms can be better than global ones since they can find the local optimal based on current situations.</li>
+</ul>
+
+<h3 id="5-how-to-judge-the-performance-of-one-parallel-program">5. How to judge the performance of one parallel program</h3>
+
+<p>Omitted… Refer to <a href="https://python-parallel-programmning-cookbook.readthedocs.io/zh_CN/latest/chapter1/06_How_to_evaluate_the_performance_of_a_parallel_program.html">6. 如何评估并行程序的性能</a></p>
+
+<h3 id="678">6,7,8</h3>
+
+<p>Omitted… You may refer to <a href="https://www.liaoxuefeng.com/wiki/1016959663602400">here(廖雪峰的python教程</a>) to learn Python</p>
+
+<h3 id="9-intro-to-process-and-threading">9. Intro to Process and Threading</h3>
+
+<p>You have to remember one sentence and that’s enough:</p>
+
+<blockquote>
+  <p>进程是系统进行资源分配和调度的一个独立单位. 线程是进程的一个实体,是CPU调度和分派的基本单位,它是比进程更小的能独立运行的基本单位.线程自己基本上不拥有系统资源,只拥有一点在运行中必不可少的资源。</p>
+</blockquote>
+
+<h2 id="chapter-2-parallel-based-on-threading">Chapter 2 Parallel based on Threading</h2>
+
+<p>考虑到Python目前我需要用到的加速都是基于进程的，打算跳过这章，先学第三章，以后有空再回来学这章。至于为啥嘞，首先Python有GIL，所以不论你开几个线程，默认Python都只会占用一个核，可是我们现在基本上都是多核处理器了，所以想要提高效率就要增加每个CPU的使用率。其次，线程相对于进程的一个比较大的优势就是它的上下文切换速度比进程快，但是实际上利用多个CPU并行的提升远远大于上下文切换的代价~没错 我就是这么功利：）</p>
+
+<h2 id="chapter-3-parallel-based-on-process">Chapter 3 Parallel based on Process</h2>
+
+<h3 id="1-intro">1. Intro</h3>
+
+<p>In this chapter, we will mainly cover about <code class="highlighter-rouge">multiprocessing</code> and <code class="highlighter-rouge">mp4py</code> module in Python library.</p>
+
+<p><code class="highlighter-rouge">multiprocessing</code> implements the shared memory mechanism which enables processors to access shared memory.</p>
+
+<p><code class="highlighter-rouge">mp4py</code> implements message passing mechanism (design pattern) which enables processes messages without sharing anything. All information are passed through messages.</p>
+
+<p>Here is one example code</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">multiprocessing</span> <span class="kn">import</span> <span class="n">Pool</span>
+<span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+  <span class="k">return</span> <span class="n">x</span> <span class="o">*</span> <span class="n">x</span>
+<span class="n">p</span> <span class="o">=</span> <span class="n">Pool</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="nb">map</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
+
+<span class="o">&gt;&gt;</span><span class="n">output</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">9</span><span class="p">]</span>
+</code></pre></div></div>
+
+<p>The author(maybe translator) mentioned that function f should be declared out of this file and called as one module. However, that’s not necessary. What you need to do is to define function <code class="highlighter-rouge">f</code> before you declare process pool, like what I wrote above.</p>
+
+<h3 id="2-how-to-generate-one-process">2. How to generate one process?</h3>
+
+<p>Spawn means generate, which refers to the generation of son process by its father process. These process can be executed asynchronous or synchronous. The following code shows how can we create processes:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">multiprocessing</span>
+<span class="k">def</span> <span class="nf">foo</span><span class="p">(</span><span class="n">i</span><span class="p">):</span>
+  <span class="k">print</span><span class="p">(</span><span class="s">"called function in process: </span><span class="si">%</span><span class="s">s"</span> <span class="o">%</span> <span class="n">i</span><span class="p">)</span>
+  <span class="k">return</span>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">'__main__'</span><span class="p">:</span>
+  <span class="n">process_jobs</span> <span class="o">=</span> <span class="p">[]</span>
+  <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">):</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">Process</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">foo</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">i</span><span class="p">,))</span>
+    <span class="n">process_jobs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p><code class="highlighter-rouge">start</code> means start this process and <code class="highlighter-rouge">join</code> means wait until the process finished.</p>
+
+<p>If you forget to call <code class="highlighter-rouge">join</code> method, the process will not be freed, even if the main process ends.</p>
+
+<h3 id="3-how-to-name-one-process">3. How to name one process</h3>
+
+<p>Omitted… No use for now</p>
+
+<h3 id="4-how-to-run-process-in-the-background">4. How to run process in the background</h3>
+
+<p>Set the <strong>daemon</strong> to be True.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">multiprocessing</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+<span class="k">def</span> <span class="nf">foo</span><span class="p">():</span>
+  <span class="n">name</span> <span class="o">=</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">current_process</span><span class="p">()</span><span class="o">.</span><span class="n">name</span>
+  <span class="k">print</span><span class="p">(</span><span class="s">"Starting&gt;"</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+  <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+  <span class="k">print</span><span class="p">(</span><span class="s">"Exiting </span><span class="si">%</span><span class="s">s"</span><span class="o">%</span> <span class="n">name</span><span class="p">)</span>
+  
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">'__main__'</span><span class="p">:</span>
+  <span class="n">bg_process</span> <span class="o">=</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">Process</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">'bg_process'</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="n">foo</span><span class="p">)</span>
+  <span class="n">bg_process</span><span class="o">.</span><span class="n">daemon</span> <span class="o">=</span> <span class="bp">True</span>
+  <span class="n">NO_bg_process</span> <span class="o">=</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">Process</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">'NO_bg_process'</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="n">foo</span><span class="p">)</span>
+  <span class="n">NO_bg_process</span><span class="o">.</span><span class="n">daemon</span> <span class="o">=</span> <span class="bp">False</span>
+  <span class="n">bg_process</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+  <span class="n">NO_bg_process</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p>background process is not allowed to new more son process. Otherwise, its child process may become orphan process when background process exit along with its father process.</p>
+
+<h3 id="5-how-to-terminate-process">5. How to terminate process</h3>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">multiprocessing</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="k">def</span> <span class="nf">foo</span><span class="p">():</span>
+  <span class="k">print</span><span class="p">(</span><span class="s">'Starting function'</span><span class="p">)</span>
+  <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+  <span class="k">print</span><span class="p">(</span><span class="s">'Finished function'</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">'__main__'</span><span class="p">:</span>
+  <span class="n">p</span> <span class="o">=</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">Process</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">foo</span><span class="p">)</span>
+  <span class="n">p</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+  <span class="n">p</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span>
+  <span class="n">p</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+</code></pre></div></div>
+
+<h3 id="7-how-to-exchange-object-within-processes">7. How to exchange object within processes</h3>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">multiprocessing</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">random</span>
+
+<span class="k">class</span> <span class="nc">Producer</span><span class="p">(</span><span class="n">multiprocessing</span><span class="o">.</span><span class="n">Process</span><span class="p">):</span>
+  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">queue</span><span class="p">):</span>
+    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__init__</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">queue</span> <span class="o">=</span> <span class="n">queue</span>
+  <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+      <span class="n">item</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">256</span><span class="p">)</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+      <span class="k">print</span><span class="p">(</span><span class="s">"Process Producer : item </span><span class="si">%</span><span class="s">d appended to queue </span><span class="si">%</span><span class="s">s"</span> <span class="o">%</span> <span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+      <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+      <span class="k">print</span><span class="p">(</span><span class="s">"The size of queue is </span><span class="si">%</span><span class="s">s"</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">qsize</span><span class="p">())</span>
+<span class="k">class</span> <span class="nc">Consumer</span><span class="p">(</span><span class="n">multiprocessing</span><span class="o">.</span><span class="n">Process</span><span class="p">):</span>
+  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">queue</span><span class="p">):</span>
+    <span class="n">multiprocessing</span><span class="o">.</span><span class="n">Process</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">queue</span> <span class="o">=</span> <span class="n">queue</span>
+  <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+      <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">empty</span><span class="p">():</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">"the queue is empty"</span><span class="p">)</span>
+        <span class="k">break</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">item</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">'Process Consumer : item </span><span class="si">%</span><span class="s">d popped from by </span><span class="si">%</span><span class="s">s </span><span class="se">\n</span><span class="s">'</span> <span class="o">%</span> <span class="p">(</span><span class="n">item</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">'__main__'</span><span class="p">:</span>
+  <span class="n">queue</span> <span class="o">=</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">Queue</span><span class="p">()</span>
+  <span class="n">process_producer</span> <span class="o">=</span> <span class="n">Producer</span><span class="p">(</span><span class="n">queue</span><span class="p">)</span>
+  <span class="n">process_consumer</span> <span class="o">=</span> <span class="n">Consumer</span><span class="p">(</span><span class="n">queue</span><span class="p">)</span>
+  <span class="n">process_producer</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+  <span class="n">process_consumer</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+  <span class="n">process_producer</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+  <span class="n">process_consumer</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+</code></pre></div></div>
+
+<h3 id="8-how-to-synchronize-processes">8. How to synchronize processes</h3>
+
+<p>When sharing data among processes, one need to take the responsibility to garentee that data is consistant. Here are some tips:</p>
+
+<ul>
+  <li>Lock, for each <code class="highlighter-rouge">Lock</code> class, it holds two methods: <code class="highlighter-rouge">acquire()</code> and <code class="highlighter-rouge">release()</code> to control the rights to read/write.</li>
+  <li>Event, to implement simple messages between processes. One process sends the signal and the other waits the signal. (<code class="highlighter-rouge">set()</code> and <code class="highlighter-rouge">clear()</code>)</li>
+  <li>Condition, <code class="highlighter-rouge">wait()</code> and <code class="highlighter-rouge">notify_all()</code></li>
+  <li>Semaphore</li>
+  <li>Rlock</li>
+  <li>Barrier, to limit the processing order of processes</li>
+</ul>
+
+<p>Here is an example on how to utilize <code class="highlighter-rouge">barrier</code> to synchronize two processes.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">multiprocessing</span>
+<span class="kn">from</span> <span class="nn">multiprocessing</span> <span class="kn">import</span> <span class="n">Barrier</span><span class="p">,</span> <span class="n">Lock</span><span class="p">,</span> <span class="n">Process</span>
+<span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">time</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+
+<span class="k">def</span> <span class="nf">test_with_barrier</span><span class="p">(</span><span class="n">synchronizer</span><span class="p">,</span> <span class="n">serializer</span><span class="p">):</span>
+  <span class="n">name</span> <span class="o">=</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">current_process</span><span class="p">()</span><span class="o">.</span><span class="n">name</span>
+  <span class="n">synchronizer</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+  <span class="n">now</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
+  <span class="k">with</span> <span class="n">serializer</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">"process </span><span class="si">%</span><span class="s">s ---&gt; </span><span class="si">%</span><span class="s">s"</span><span class="o">%</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span><span class="n">now</span><span class="p">)))</span>
+<span class="k">def</span> <span class="nf">test_without_barrier</span><span class="p">():</span>
+  <span class="n">name</span> <span class="o">=</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">current_process</span><span class="p">()</span><span class="o">.</span><span class="n">name</span>
+  <span class="n">now</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
+  <span class="k">print</span><span class="p">(</span><span class="s">"process </span><span class="si">%</span><span class="s">s ---&gt; </span><span class="si">%</span><span class="s">s"</span><span class="o">%</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span><span class="n">now</span><span class="p">)))</span>
+  
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">'__main__'</span><span class="p">:</span>
+  <span class="n">synchronizer</span> <span class="o">=</span> <span class="n">Barrier</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+  <span class="n">serializer</span> <span class="o">=</span> <span class="n">Lock</span><span class="p">()</span>
+  <span class="n">Process</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">'p1-test_with_barrier'</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="n">test_with_barrier</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">synchronizer</span><span class="p">,</span> <span class="n">serializer</span><span class="p">))</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+  <span class="n">Process</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">'p2-test_with_barrier'</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="n">test_with_barrier</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">synchronizer</span><span class="p">,</span> <span class="n">serializer</span><span class="p">))</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+  <span class="n">Process</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">'p3-test_without_barrier'</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="n">test_without_barrier</span><span class="p">)</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+  <span class="n">Process</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">'p4-test_without_barrier'</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="n">test_without_barrier</span><span class="p">)</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+</code></pre></div></div>
+
+<h3 id="9-a-simple-way-to-share-data-among-processes-manager">9. A simple way to share data among processes– Manager!</h3>
+
+<p>When you new a manager, it can hold what you want and allows different processes to access it.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">multiprocessing</span>
+<span class="k">def</span> <span class="nf">worker</span><span class="p">(</span><span class="n">dictionary</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+  <span class="n">dictionary</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">item</span>
+  <span class="k">print</span><span class="p">(</span><span class="s">"key = </span><span class="si">%</span><span class="s">d value = </span><span class="si">%</span><span class="s">d"</span><span class="o">%</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">item</span><span class="p">))</span>
+  
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">"__main__"</span><span class="p">:</span>
+  <span class="n">mgr</span> <span class="o">=</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">Manager</span><span class="p">()</span>
+  <span class="n">dictionary</span> <span class="o">=</span> <span class="n">mgr</span><span class="o">.</span><span class="nb">dict</span><span class="p">()</span>
+  <span class="n">jobs</span> <span class="o">=</span> <span class="p">[</span><span class="n">multiprocessing</span><span class="o">.</span><span class="n">Process</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">worker</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">dictionary</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">i</span><span class="o">*</span><span class="mi">2</span><span class="p">))</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">7</span><span class="p">)]</span>
+  <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">jobs</span><span class="p">:</span>
+    <span class="n">j</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+  <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">jobs</span><span class="p">:</span>
+    <span class="n">j</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+  <span class="k">print</span><span class="p">(</span><span class="s">"Results"</span><span class="p">,</span> <span class="n">dictionary</span><span class="p">)</span>
+</code></pre></div></div>
+
+<h3 id="10-how-to-use-processpool">10. How to use ProcessPool</h3>
+
+<ul>
+  <li><code class="highlighter-rouge">apply()</code>: block until getting result</li>
+  <li><code class="highlighter-rouge">apply_async()</code>: the return value is an object, and it’s a asynchronous operation, which means, the main process will continue until all child processes start processing.</li>
+  <li><code class="highlighter-rouge">map()</code>: it can receive iteratable data and process functions in parallel.</li>
+  <li><code class="highlighter-rouge">map_async()</code>: omit</li>
+</ul>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">multiprocessing</span>
+<span class="k">def</span> <span class="nf">function_square</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+  <span class="n">result</span> <span class="o">=</span> <span class="n">data</span><span class="o">**</span><span class="mi">2</span>
+  <span class="k">return</span> <span class="n">result</span>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">'__main__'</span><span class="p">:</span>
+  <span class="n">inputs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">100</span><span class="p">))</span>
+  <span class="n">pool</span> <span class="o">=</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">Pool</span><span class="p">(</span><span class="n">processes</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+  <span class="n">pool_outputs</span> <span class="o">=</span> <span class="n">pool</span><span class="o">.</span><span class="nb">map</span><span class="p">(</span><span class="n">function_square</span><span class="p">,</span> <span class="n">inputs</span><span class="p">)</span>
+  <span class="n">pool</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+  <span class="n">pool</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p>由于MPI4Py在mac上好像装不上，而且我可能用不到，就又跳了。。。第三章结束～</p>
+
+<h2 id="chapter-4-asynchronous-programming">Chapter 4 Asynchronous Programming</h2>
+
+<h3 id="1-use-concurrentfutures-module">1. Use <code class="highlighter-rouge">concurrent.futures</code> Module</h3>
+
+<p>This module consists of:</p>
+
+<ul>
+  <li><code class="highlighter-rouge">Concurrent.futures.Executor</code>, which is a virtual base class, and provides the method to execute asynchronize.</li>
+  <li><code class="highlighter-rouge">submit(function, argument)</code></li>
+  <li><code class="highlighter-rouge">map(function, augment)</code></li>
+  <li><code class="highlighter-rouge">shutdown(Wait=True)</code></li>
+</ul>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">concurrent.futures</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+<span class="n">num_list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">]</span>
+<span class="k">def</span> <span class="nf">evaluate_item</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+  <span class="n">res</span> <span class="o">=</span> <span class="n">count</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">result_item</span>
+
+<span class="k">def</span> <span class="nf">count</span><span class="p">(</span><span class="n">num</span><span class="p">):</span>
+  <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1000000</span><span class="p">):</span>
+    <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+  <span class="k">return</span> <span class="n">i</span> <span class="o">*</span> <span class="n">number</span>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">"__main__"</span><span class="p">:</span>
+  <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+  <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">num_list</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">evaluate_item</span><span class="p">(</span><span class="n">item</span><span class="p">))</span>
+    
+  <span class="k">with</span> <span class="n">concurrent</span><span class="o">.</span><span class="n">futures</span><span class="o">.</span><span class="n">ThreadPoolExecutor</span><span class="p">(</span><span class="n">max_workers</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span> <span class="k">as</span> <span class="n">executor</span><span class="p">:</span>
+    <span class="n">futures</span> <span class="o">=</span> <span class="p">[</span><span class="n">executor</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span><span class="n">evaluate_item</span><span class="p">,</span> <span class="n">item</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">num_list</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">future</span> <span class="ow">in</span> <span class="n">concurrent</span><span class="o">.</span><span class="n">futures</span><span class="o">.</span><span class="n">as_complete</span><span class="p">(</span><span class="n">futures</span><span class="p">):</span>
+      <span class="k">print</span><span class="p">(</span><span class="n">future</span><span class="o">.</span><span class="n">result</span><span class="p">())</span>
+      
+  <span class="k">with</span> <span class="n">concurrent</span><span class="o">.</span><span class="n">futures</span><span class="o">.</span><span class="n">ProcessPoolExecutor</span><span class="p">(</span><span class="n">max_workers</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span> <span class="k">as</span> <span class="n">executor</span><span class="p">:</span>
+    <span class="n">futures</span> <span class="o">=</span> <span class="p">[</span><span class="n">executor</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span><span class="n">evaluate_item</span><span class="p">,</span> <span class="n">item</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">num_list</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">future</span> <span class="ow">in</span> <span class="n">concurrent</span><span class="o">.</span><span class="n">futures</span><span class="o">.</span><span class="n">as_complete</span><span class="p">(</span><span class="n">futures</span><span class="p">):</span>
+      <span class="k">print</span><span class="p">(</span><span class="n">future</span><span class="o">.</span><span class="n">result</span><span class="p">())</span>
+</code></pre></div></div>
+
+<p>The above code implements how to utilize <code class="highlighter-rouge">ThreadPoolExecutor</code> and <code class="highlighter-rouge">ProcessPoolExecutor</code>.</p>
+
+<h3 id="2-use-asyncio-to-manage-events-loop">2. Use <code class="highlighter-rouge">Asyncio</code> to manage events loop</h3>
+
+<p><code class="highlighter-rouge">Asyncio</code> consists of</p>
+
+<ul>
+  <li>Events Loop, so each process owns their own event loop</li>
+  <li>Coroutine(协程) is the general concepts of child process. It can be paused during processing, so that it can wait until something finished</li>
+  <li>Futures, represents for unfinished computation</li>
+  <li>Tasks, the child class of <code class="highlighter-rouge">Asyncio</code></li>
+</ul>
+
+<p>The first question is what is event loop?</p>
+
+<p>During the process of the program, it continously trace the order of events and put them into the queue.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">while</span><span class="p">(</span><span class="mi">1</span><span class="p">){</span>
+  <span class="n">events</span> <span class="o">=</span> <span class="n">getEvents</span><span class="p">();</span>
+  <span class="k">for</span> <span class="p">(</span><span class="n">e</span> <span class="ow">in</span> <span class="n">events</span><span class="p">):</span>
+  	<span class="n">processEvent</span><span class="p">(</span><span class="n">e</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Here is an example code</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">asyncio</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+<span class="k">def</span> <span class="nf">func_1</span><span class="p">(</span><span class="n">end_time</span><span class="p">,</span> <span class="n">loop</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">"Func1 called"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">loop</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">+</span> <span class="mf">1.</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">end_time</span><span class="p">:</span>
+        <span class="n">loop</span><span class="o">.</span><span class="n">call_later</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">func_2</span><span class="p">,</span> <span class="n">end_time</span><span class="p">,</span> <span class="n">loop</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">loop</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+
+<span class="k">def</span> <span class="nf">func_2</span><span class="p">(</span><span class="n">end_time</span><span class="p">,</span> <span class="n">loop</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">"Func2 called"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">loop</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">+</span> <span class="mf">1.</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">end_time</span><span class="p">:</span>
+        <span class="n">loop</span><span class="o">.</span><span class="n">call_later</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">func_3</span><span class="p">,</span> <span class="n">end_time</span><span class="p">,</span> <span class="n">loop</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">loop</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+
+<span class="k">def</span> <span class="nf">func_3</span><span class="p">(</span><span class="n">end_time</span><span class="p">,</span> <span class="n">loop</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">"Func3 called"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">loop</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">+</span> <span class="mf">1.</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">end_time</span><span class="p">:</span>
+        <span class="n">loop</span><span class="o">.</span><span class="n">call_later</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">func_1</span><span class="p">,</span> <span class="n">end_time</span><span class="p">,</span> <span class="n">loop</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">loop</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+
+<span class="k">def</span> <span class="nf">func_4</span><span class="p">(</span><span class="n">end_time</span><span class="p">,</span> <span class="n">loop</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">"Func4 called"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">loop</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">+</span> <span class="mf">1.</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">end_time</span><span class="p">:</span>
+        <span class="n">loop</span><span class="o">.</span><span class="n">call_later</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">func_4</span><span class="p">,</span> <span class="n">end_time</span><span class="p">,</span> <span class="n">loop</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">loop</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+
+<span class="n">loop</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">get_event_loop</span><span class="p">()</span>
+
+<span class="n">end_loop</span> <span class="o">=</span> <span class="n">loop</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">+</span> <span class="mf">9.</span>
+<span class="n">loop</span><span class="o">.</span><span class="n">call_soon</span><span class="p">(</span><span class="n">func_1</span><span class="p">,</span> <span class="n">end_loop</span><span class="p">,</span> <span class="n">loop</span><span class="p">)</span>
+<span class="n">loop</span><span class="o">.</span><span class="n">run_forever</span><span class="p">()</span>
+<span class="n">loop</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</code></pre></div></div>
+
+<h3 id="use-asyncio-to-manage-coroutines">Use <code class="highlighter-rouge">Asyncio</code> to manage Coroutines</h3>
+
+<p>Before we start this lesson, you need to know what is <strong>Coroutines</strong>. Actually, coroutine is something like child function. The difference between child function and coroutine is that child function needs to be called by the main process while coroutines executed by themselves and they are connected by channels.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">asyncio</span>
+
+<span class="o">@</span><span class="n">asyncio</span><span class="o">.</span><span class="n">coroutine</span>
+<span class="k">def</span> <span class="nf">coroutine_func</span><span class="p">(</span><span class="n">func_arguments</span><span class="p">):</span>
+  <span class="c1"># Do Something
+</span></code></pre></div></div>
+
+<p>Let’s see how to simulate finite state machine through coroutines:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">asyncio</span>
+<span class="kn">from</span> <span class="nn">random</span> <span class="kn">import</span> <span class="n">randint</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+<span class="o">@</span><span class="n">asyncio</span><span class="o">.</span><span class="n">coroutine</span>
+<span class="k">def</span> <span class="nf">StartState</span><span class="p">():</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">"Start State called </span><span class="se">\n</span><span class="s">"</span><span class="p">)</span>
+    <span class="n">input_value</span> <span class="o">=</span> <span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">input_value</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="k">yield</span> <span class="k">from</span> <span class="n">State2</span><span class="p">(</span><span class="n">input_value</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="k">yield</span> <span class="k">from</span> <span class="n">State1</span><span class="p">(</span><span class="n">input_value</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">"Resume of the Transition : </span><span class="se">\n</span><span class="s">Start State calling "</span> <span class="o">+</span> <span class="n">result</span><span class="p">)</span>
+
+<span class="o">@</span><span class="n">asyncio</span><span class="o">.</span><span class="n">coroutine</span>
+<span class="k">def</span> <span class="nf">State1</span><span class="p">(</span><span class="n">transition_value</span><span class="p">):</span>
+    <span class="n">outputValue</span> <span class="o">=</span>  <span class="nb">str</span><span class="p">(</span><span class="s">"State 1 with transition value = </span><span class="si">%</span><span class="s">s </span><span class="se">\n</span><span class="s">"</span> <span class="o">%</span> <span class="n">transition_value</span><span class="p">)</span>
+    <span class="n">input_value</span> <span class="o">=</span> <span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">"...Evaluating..."</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">input_value</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="k">yield</span> <span class="k">from</span> <span class="n">State3</span><span class="p">(</span><span class="n">input_value</span><span class="p">)</span>
+    <span class="k">else</span> <span class="p">:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="k">yield</span> <span class="k">from</span> <span class="n">State2</span><span class="p">(</span><span class="n">input_value</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="s">"State 1 calling "</span> <span class="o">+</span> <span class="n">result</span>
+    <span class="k">return</span> <span class="n">outputValue</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+
+<span class="o">@</span><span class="n">asyncio</span><span class="o">.</span><span class="n">coroutine</span>
+<span class="k">def</span> <span class="nf">State2</span><span class="p">(</span><span class="n">transition_value</span><span class="p">):</span>
+    <span class="n">outputValue</span> <span class="o">=</span>  <span class="nb">str</span><span class="p">(</span><span class="s">"State 2 with transition value = </span><span class="si">%</span><span class="s">s </span><span class="se">\n</span><span class="s">"</span> <span class="o">%</span> <span class="n">transition_value</span><span class="p">)</span>
+    <span class="n">input_value</span> <span class="o">=</span> <span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">"...Evaluating..."</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">input_value</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="k">yield</span> <span class="k">from</span> <span class="n">State1</span><span class="p">(</span><span class="n">input_value</span><span class="p">)</span>
+    <span class="k">else</span> <span class="p">:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="k">yield</span> <span class="k">from</span> <span class="n">State3</span><span class="p">(</span><span class="n">input_value</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="s">"State 2 calling "</span> <span class="o">+</span> <span class="n">result</span>
+    <span class="k">return</span> <span class="n">outputValue</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+
+<span class="o">@</span><span class="n">asyncio</span><span class="o">.</span><span class="n">coroutine</span>
+<span class="k">def</span> <span class="nf">State3</span><span class="p">(</span><span class="n">transition_value</span><span class="p">):</span>
+    <span class="n">outputValue</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="s">"State 3 with transition value = </span><span class="si">%</span><span class="s">s </span><span class="se">\n</span><span class="s">"</span> <span class="o">%</span> <span class="n">transition_value</span><span class="p">)</span>
+    <span class="n">input_value</span> <span class="o">=</span> <span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">"...Evaluating..."</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">input_value</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="k">yield</span> <span class="k">from</span> <span class="n">State1</span><span class="p">(</span><span class="n">input_value</span><span class="p">)</span>
+    <span class="k">else</span> <span class="p">:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="k">yield</span> <span class="k">from</span> <span class="n">EndState</span><span class="p">(</span><span class="n">input_value</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="s">"State 3 calling "</span> <span class="o">+</span> <span class="n">result</span>
+    <span class="k">return</span> <span class="n">outputValue</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+
+<span class="o">@</span><span class="n">asyncio</span><span class="o">.</span><span class="n">coroutine</span>
+<span class="k">def</span> <span class="nf">EndState</span><span class="p">(</span><span class="n">transition_value</span><span class="p">):</span>
+    <span class="n">outputValue</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="s">"End state with transition value = </span><span class="si">%</span><span class="s">s </span><span class="se">\n</span><span class="s">"</span> <span class="o">%</span> <span class="n">transition_value</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">"Stop computation..."</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">outputValue</span>
+
+<span class="n">loop</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">get_event_loop</span><span class="p">()</span>
+<span class="n">loop</span><span class="o">.</span><span class="n">run_until_complete</span><span class="p">(</span><span class="n">StartState</span><span class="p">())</span>
+</code></pre></div></div>
+
+<p>Something like DFS actually hhh.</p>
+
+<h3 id="use-asyncio-to-control-tasks">Use <code class="highlighter-rouge">Asyncio</code> to control Tasks</h3>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">asyncio</span>
+
+<span class="o">@</span><span class="n">asyncio</span><span class="o">.</span><span class="n">coroutine</span>
+<span class="k">def</span> <span class="nf">factorial</span><span class="p">(</span><span class="n">num</span><span class="p">):</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">num</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">"Asyncio.Task: Compute factorial(</span><span class="si">%</span><span class="s">s)"</span><span class="o">%</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+        <span class="k">yield</span> <span class="k">from</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">f</span> <span class="o">*=</span> <span class="n">i</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">"Asyncio Task - factorial(</span><span class="si">%</span><span class="s">s) = </span><span class="si">%</span><span class="s">s"</span><span class="o">%</span><span class="p">(</span><span class="n">num</span><span class="p">,</span> <span class="n">f</span><span class="p">))</span>
+
+<span class="o">@</span><span class="n">asyncio</span><span class="o">.</span><span class="n">coroutine</span>
+<span class="k">def</span> <span class="nf">fibonacci</span><span class="p">(</span><span class="n">num</span><span class="p">):</span>
+    <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">"Asyncio Task: Compute Fib (</span><span class="si">%</span><span class="s">s)"</span><span class="o">%</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+        <span class="k">yield</span> <span class="k">from</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">b</span><span class="p">,</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">"Asyncio Task - fib(</span><span class="si">%</span><span class="s">s) = </span><span class="si">%</span><span class="s">s"</span><span class="o">%</span><span class="p">(</span><span class="n">num</span><span class="p">,</span> <span class="n">a</span><span class="p">))</span>
+
+<span class="o">@</span><span class="n">asyncio</span><span class="o">.</span><span class="n">coroutine</span>
+<span class="k">def</span> <span class="nf">binomialCoeff</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">result</span> <span class="o">*</span> <span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="n">i</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">"Asyncio Task: Compute binomialCoeff (</span><span class="si">%</span><span class="s">s)"</span><span class="o">%</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+        <span class="k">yield</span> <span class="k">from</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">"Asyncio Task - binomialCoeff(</span><span class="si">%</span><span class="s">s, </span><span class="si">%</span><span class="s">s) = </span><span class="si">%</span><span class="s">s"</span><span class="o">%</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">result</span><span class="p">))</span>
+
+<span class="n">tasks</span> <span class="o">=</span> <span class="p">[</span><span class="n">asyncio</span><span class="o">.</span><span class="n">Task</span><span class="p">(</span><span class="n">factorial</span><span class="p">(</span><span class="mi">10</span><span class="p">)),</span>
+         <span class="n">asyncio</span><span class="o">.</span><span class="n">Task</span><span class="p">(</span><span class="n">fibonacci</span><span class="p">(</span><span class="mi">10</span><span class="p">)),</span>
+         <span class="n">asyncio</span><span class="o">.</span><span class="n">Task</span><span class="p">(</span><span class="n">binomialCoeff</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">10</span><span class="p">))]</span>
+<span class="n">loop</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">get_event_loop</span><span class="p">()</span>
+<span class="n">loop</span><span class="o">.</span><span class="n">run_until_complete</span><span class="p">(</span><span class="n">asyncio</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span><span class="n">tasks</span><span class="p">))</span>
+<span class="n">loop</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p>So you can view this program as something that an execute line skip among three functions(actually coroutines). When we called <code class="highlighter-rouge">yield</code>, we will move to the next task.</p>
+
+<p>And if you don’t call <code class="highlighter-rouge">yield</code>, you may find these tasks are executed one by one orderly.</p>
+
+<h2 id="reference">Reference</h2>
+
+<p>[1] <a href="https://python-parallel-programmning-cookbook.readthedocs.io/zh_CN/latest/index.html">Python并行编程 中文版</a></p>
+
+
+        </div>
+        <p class="mt4" style="font-family: 'Sens Serif Pro'">
+  End of Post<br>
+  <span class="silver">at 18:39</span>
+</p>
+<img src="http://localhost:4000/images/scribble3.png" alt="scribble" />
+
+      </main>
+      <section class="fixed-l mw7 center w-100 top-50 tc pb4 nt4" style="max-width: 58rem">
+  
+    <a href="http://localhost:4000/posts/rcnn-series-time" class="no-underline f1 light-blue hover-silver nl5 fl-l ph3">‹</a>
+  
+  
+    <a href="http://localhost:4000/posts/relearning-tabular-data-competition-kaggle-ieee-fraud-detection" class="no-underline f1 light-blue hover-silver nr5 fr-l ph3">›</a>
+  
+</section>
+    </div>
+    <footer class="mw7 center tc pt3 pb4 silver">
+      Built with Jekyll using <a href="http://github.com/muan/scribble" class="link silver hover-blue pv1">Scribble</a>.
+      <img src="http://localhost:4000/images/scribble2.png" alt="scribble" class="mt4 db center" />
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,241 @@
+
+<!doctype>
+<html lang="en">
+  <head>
+    <meta content='XGBoost Explanation - Zehui Chen' name='title' />
+    <meta content='XGBoost Explanation - Zehui Chen' name='og:title' />
+    <title>XGBoost Explanation - Zehui Chen</title>
+    <link href='http://localhost:4000/images/fav.png' rel='shortcut icon'>
+<link href='http://localhost:4000/stylesheets/style.css' rel='stylesheet' type='text/css' />
+<link href='http://localhost:4000/stylesheets/syntax.css' rel='stylesheet' type='text/css' />
+
+<meta content='width=device-width, initial-scale=1.0, user-scalable=no' name='viewport'>
+<meta content='text/html; charset=utf-8' http-equiv='content-type' />
+
+  <meta content='http://localhost:4000/posts/xgboost-explanation' property='og:url' />
+  <meta content="In most kaggle competition, especially in tabular data ones, Gradient Boosting Machine(GBM) ha s shown its competitiv..." property='og:description' />
+  <meta content="article" property="og:type" />
+
+<!-- - -->
+
+
+
+
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+          inlineMath: [['$','$']]
+        }
+      });
+    </script> <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML' async></script>
+  </head>
+  <body class="lh-copy dark-gray pa0 f6 sans-serif bg-super-white">
+    <header class="tc mt4">
+      <a href="http://localhost:4000">
+        <img src="http://localhost:4000/images/new.jpg" alt="Home" width="70" height="70" style="border-radius:50%;">
+      </a>
+      <p>Zehui Chen</p>
+    </header>
+    <div class="mw8 bg-white mt4 mb3 center br2-ns bt bb ba-ns b--light-gray" style="max-width: 59rem">
+      <nav class="bb b--light-gray pv4 tc" aria-label="Main">
+        
+          <a class="link link-title blue hover-mid-gray mh2 pv1" style="color: #1d5884 !important; font-size: 13px;"
+             href="http://localhost:4000/about">
+             About
+           </a>
+        
+          <a class="link link-title blue hover-mid-gray mh2 pv1" style="color: #1d5884 !important; font-size: 13px;"
+             href="http://localhost:4000/">
+             Blog
+           </a>
+        
+          <a class="link link-title blue hover-mid-gray mh2 pv1" style="color: #1d5884 !important; font-size: 13px;"
+             href="http://localhost:4000/friends">
+             Friends
+           </a>
+        
+          <a class="link link-title blue hover-mid-gray mh2 pv1" style="color: #1d5884 !important; font-size: 13px;"
+             href="https://github.com/zehuichen123/">
+             Github
+           </a>
+        
+          <a class="link link-title blue hover-mid-gray mh2 pv1" style="color: #1d5884 !important; font-size: 13px;"
+             href="https://drive.google.com/file/d/1KuLvfYPDnHv6cTE2BvoeSg9xbtK7TA2Q/view">
+             Resume
+           </a>
+        
+      </nav>
+
+      <main class="tl f6 relative pa4 pa5-ns overflow-hidden" style="padding-top: 2rem !important; padding-bottom: 2rem">
+        
+          <div class="mb4">
+            <div class="fw600 light-silver mt1">13 Aug 2019</div>
+            <h1 class="ttu f3 mt0 lh-title cb mb2">
+              
+              XGBoost Explanation
+            </h1>
+            
+              <!-- <a href="https://twitter.com/share" class="twitter-share-button">Tweet</a>
+              <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+              <div class="fb-like" data-send="false" data-layout="button_count" data-width="100" data-show-faces="false" data-font="arial" data-action="like"></div> -->
+              <!-- Go to www.addthis.com/dashboard to customize your tools --> <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5a57a2d5807d68ea"></script>
+            
+          </div>
+        
+        <div class="markdown-body">
+          <p>In most kaggle competition, especially in tabular data ones, Gradient Boosting Machine(GBM) ha s shown its competitive performance, even surpass neural network by a large margin. Believe it or not, IEEE-CIS Fraud Detection[1] is an example. In this post, we will mainly focus on the algorithm on XGBoost and Gradient Boosting.</p>
+
+<hr />
+
+<h2 id="intro-to-xgboost">Intro to XGBoost</h2>
+
+<p>XGBoost[2] is the abbreviation of eXtreme Gradient Boosting. The features of XGBoost are</p>
+
+<ul>
+  <li>Based on the boosting tree which can deal with sparse data</li>
+  <li>Weighted function for searching best split point</li>
+  <li>Parallel and distributed computation</li>
+  <li>Blocked data for high efficiency computation</li>
+</ul>
+
+<hr />
+
+<h2 id="fundamental-concepts">Fundamental Concepts</h2>
+
+<h3 id="optimazation-in-functional-space">Optimazation in Functional Space</h3>
+
+<p>In supervised learning problem, our target is to learn a best assumption $F^*(x)\in H$ which have the minimum general error.</p>
+
+<script type="math/tex; mode=display">F^*(X) = arg min_{F(X)}E_{y, X}\Psi(y, F(X))</script>
+
+<p>$\Psi(y, F(X))$ is some kind of loss function.</p>
+
+<p>since we don’t know union distribution $P(X, Y)$, we can only use mean error in training data to perform nondestructive analysis. If we choose different hypothesis, we will get different $P$, and therefore, different mean error.Then our problem will become an optimazation in a $N$ dimensional space:</p>
+
+<script type="math/tex; mode=display">min\Psi(P) = \Psi(y, F(x_1), F(x_2), ..., F(x_N))</script>
+
+<p>which means, our optimization target is to minimize the expectation of loss function which specified on $y$ in the marginal distribution of $x$.</p>
+
+<p>If our loss function is tractable, we can use gradient-based optimization methods to find the point $P^{\star}$ in space $P$ to minimize $\Psi(P)$. At this time, the assumption is what we want for $F^{*}$.</p>
+
+<h3 id="forward-stagewise-additive-modeling">Forward Stagewise Additive Modeling</h3>
+
+<p>FSAM is the core of boosting algorithm. The main idea of ensemble method is to train multiple models and combine them together to form a competitve model. In Boosting algorithms, we often generate base learners iteratively and add them together to form the final predictor.</p>
+
+<script type="math/tex; mode=display">F_{m-1}(x) = \sum_{k=1}^{m-1}\alpha_k f_k(x)</script>
+
+<p>In the next iteration, we are going to train $f_m(x)$ to learn the residual</p>
+
+<script type="math/tex; mode=display">(\alpha_m, f_m(x)) = \text{arg min} E_{y,X} \Psi(y, F_{m-1}(X) + \alpha f(x)) \\ F_m{x} = F_{m-1}(x)+ \alpha_m f_m(x)</script>
+
+<hr />
+
+<h2 id="gradient-boosting">Gradient Boosting</h2>
+
+<p>When talking about search for next residual, there is a simple way in optimization theory–linear search. Suppose our loss function is first-order tractable. Then we can compute the gradient for $P_{m-1}$ with respect to loss function and get the minus gradient $\rho_{m-1}$.</p>
+
+<script type="math/tex; mode=display">\nabla \Psi(P_{m-1}) = -\frac{\partial\Psi(P_{m-1})}{\partial P_{m-1}} \\ =-\frac{\partial \Psi(F_{m-1}(X))}{\partial F_{m-1}(X)}</script>
+
+<p>Then search point $P_m$ which meets the minimum loss in the minus gradient direction</p>
+
+<script type="math/tex; mode=display">P_m = \text{arg min}_{\lambda} \Psi (P_{m-1} - \lambda \nabla \Psi(P_{m-1}))\\ = F_{m-1}(X) - \lambda_m \frac{\partial \Psi (F_{m-1}(X))}{\partial F_{m-1}(X)}</script>
+
+<p>You may ask, why not just to learn the residual given from loss function directly?</p>
+
+<p>I found the answer from book &lt;Statistical Learning Methods&gt; by Li hang. When loss function is square error or exponantial error, the optimization will be easy. But what about other loss function format? Hence, Freidaman proposed gradient boosting method, which is the approximation of fastest descent algorithm. The core of this idea is to utilize the minus gradient at this point as the approximation of residual to learn a base tree.</p>
+
+<hr />
+
+<h2 id="xgboost">XGBoost</h2>
+
+<h3 id="loss-function-for-xgboost">Loss function for XGBoost</h3>
+
+<p>XGBoost is tree-based boosting algorithm and it optimize the original loss function and adds regularization term</p>
+
+<script type="math/tex; mode=display">\Psi (y, F(X)) = \sum_{i=1}^N \Psi(y_i, F(X_i)) + \sum_{m=0}^T \Omega(f_m) \\ =  \sum_{i=1}^N \Psi(y_i, F(X_i)) + \sum_{m=0}^T (\gamma L_m + \frac{1}{2}\lambda\lvert\lvert\omega\lvert\lvert^2)</script>
+
+<p>Among which $L_m$ is the number of leaves of $m^{th}$ iterative tree and $\omega$ is the output of each leave node in $f_m$.</p>
+
+<p>XGBoost is also an addtive model. However, instead of to fit the minus gradient at $F_{m-1}(X)$, XGBoost learns the Talyor expansion at this point with respect to loss function and minimize this loss error to train base learner.</p>
+
+<p>Hhh, remember the last paragraph in the previous chapter, the intuition of computing minus gradient is that the residual loss is hard to optimize. But for XGBoost, it use Talyor expansion to conquer this issue</p>
+
+<script type="math/tex; mode=display">\Psi (y, F(X)) = \sum_{i=1}^N \Psi(y_i, F_{m-1}(x_i) + f_m(x_i)) + \sum_{m=0}^T \Omega(f_m) \\ \qquad \qquad \qquad\qquad \approx \sum_{i=1}^N \Psi(y_i, F_{m-1}(X_i) + g_i f_m(x_i) + \frac{1}{2}h_i f_m^2(x_i)) + \sum_{m=0}^T \Omega(f_m)</script>
+
+<p>among which $g_i$ is the first-order gradient at $P_{m-1}(X)$ with respect to $F_{m-1}(x_i)$ and $h_i$ is the second-order gradient at $P_{m-1}(X)$.</p>
+
+<p>Since $\Psi(y_i, F_{m-1})$ is constant as for $m^{th}$ iteration, just move it outside of paranthesis</p>
+
+<script type="math/tex; mode=display">\Psi_m = A +  \sum^N_{i=1}[g_i f_m(x_i) + \frac{1}{2}h_i f_m^2(x_i)] + \Omega(f_m)</script>
+
+<h3 id="convert-sample-based-loss-into-node-based">Convert sample-based loss into node-based</h3>
+
+<p>Before writing this post, I am wondering why need us to compute the optimal output for each leave node? Just find the best split point to reach the best information gain may be ok. However, instead of using entropy gain of information, XGBoost proposes a new target function which directly optimize loss function. To make it convinent when computing the best split point when constructing trees, we need to first convert the sample-based loss function into node-based ones. If you don’t know what is sample-based and node-based, let’s see this example:</p>
+
+<p>Suppose at iteration $m$, we’ve construct one tree which has $L$ leave nodes($l_1, l_2, …, l_L$), and assume that $I_j = (i\lvert q(x_i) = j)$ represents that the index of samples which are assigned to the  $j^{th}$ leave node, and $q$ denotes the result from the $m^{th}$ tree. Then we can convert the original sample-based loss function into node-based one. Please check the iterative symbol of sum function.</p>
+
+<script type="math/tex; mode=display">\hat{\Psi}_m = \sum_{i=1}^N[g_i f_m(x_i) + \frac{1}{2}h_i f_m^2(x_i))] \\ \qquad \qquad \qquad = \sum_{j=1}^L[(\sum_{i\in I_j}g_i)\omega_j + \frac{1}{2}(\lambda + \sum_{i\in I_j}h_i)\omega^2_j] + \gamma L</script>
+
+<p>Then, for each leave node, we can rewrite the function to make it simpler:</p>
+
+<script type="math/tex; mode=display">\hat{\Psi} = \sum_{j=1}^L f(\omega_j) + \gamma L</script>
+
+<p>where $f(\omega_j) = (\sum_{i\in I_j} \omega_j) + \frac{1}{2}(\lambda + \sum_{i\in I_j}h_i)\omega^2_j$</p>
+
+<p>Now, we just need to compute leave node to get the optimal solution. Further, however can we find the optimal solution given these leave node parameters? An intuitive way is to use gradient based search: let its gradient equal to zero:</p>
+
+<script type="math/tex; mode=display">\omega^{\star} = -\frac{\sum_{i\in I_j}g_j}{\lambda + \sum_{i\in I_j}h_j}</script>
+
+<p>Until here, let’s compute the expected minimum loss function here:</p>
+
+<script type="math/tex; mode=display">\hat{\Psi}_m(q) = -\frac{1}{2}\sum_{j=1}^L \frac{G_j^2}{\lambda + H_j} + \gamma L</script>
+
+<p>where $G_j = \sum_{i\in I_j}g_j$ and $H_j = \sum_{i\in I_j}h_j $.</p>
+
+<p>So here we are. Instead of iterate each samples, we just need to iterate leave nodes to compute the target loss function.</p>
+
+<h3 id="split-condition">Split Condition</h3>
+
+<p>Similar to GBDT, XGBoost here compute the decreasement of loss function before and after the split.</p>
+
+<script type="math/tex; mode=display">\Delta\Psi = \frac{1}{2}[\frac{G_L^2}{\lambda + H_L} + \frac{G_R^2}{\lambda + H_R} - \frac{G^2}{\lambda + H}] -\gamma</script>
+
+<hr />
+
+<h2 id="summary">Summary</h2>
+
+<p>In this post, we’ve went through the whole process of XGBoost as well as something related to gradient boosting. However, there do exists something that we didn’t cover, espeically about split methods and how to boost the speed of search. I decided to discuss these topic in next post, about LightGBM which advanced XGBoost with faster speed. And its core idea is to optimize the search phase.</p>
+
+<hr />
+
+<h2 id="reference">Reference</h2>
+
+<p>[1] <a href="https://www.kaggle.com/c/ieee-fraud-detection/">IEEE-CIS Fraud Detection- A kaggle Competition</a></p>
+
+<p>[2] <a href="">XGBoost: A Scalable Tree Boosting System</a></p>
+
+        </div>
+        <p class="mt4" style="font-family: 'Sens Serif Pro'">
+  End of Post<br>
+  <span class="silver">at 13:09</span>
+</p>
+<img src="http://localhost:4000/images/scribble3.png" alt="scribble" />
+
+      </main>
+      <section class="fixed-l mw7 center w-100 top-50 tc pb4 nt4" style="max-width: 58rem">
+  
+    <a href="http://localhost:4000/posts/gbdt-explanation" class="no-underline f1 light-blue hover-silver nl5 fl-l ph3">‹</a>
+  
+  
+    <a href="http://localhost:4000/posts/rcnn-series-time" class="no-underline f1 light-blue hover-silver nr5 fr-l ph3">›</a>
+  
+</section>
+    </div>
+    <footer class="mw7 center tc pt3 pb4 silver">
+      Built with Jekyll using <a href="http://github.com/muan/scribble" class="link silver hover-blue pv1">Scribble</a>.
+      <img src="http://localhost:4000/images/scribble2.png" alt="scribble" class="mt4 db center" />
+    </footer>
+  </body>
+</html>

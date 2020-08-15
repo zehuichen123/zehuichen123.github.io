@@ -1,0 +1,252 @@
+
+<!doctype>
+<html lang="en">
+  <head>
+    <meta content='RCNN series - Zehui Chen' name='title' />
+    <meta content='RCNN series - Zehui Chen' name='og:title' />
+    <title>RCNN series - Zehui Chen</title>
+    <link href='http://localhost:4000/images/fav.png' rel='shortcut icon'>
+<link href='http://localhost:4000/stylesheets/style.css' rel='stylesheet' type='text/css' />
+<link href='http://localhost:4000/stylesheets/syntax.css' rel='stylesheet' type='text/css' />
+
+<meta content='width=device-width, initial-scale=1.0, user-scalable=no' name='viewport'>
+<meta content='text/html; charset=utf-8' http-equiv='content-type' />
+
+  <meta content='http://localhost:4000/posts/rcnn-series-time' property='og:url' />
+  <meta content="Outline  From R-CNN to Mask RCNN      R-CNN    Fast R-CNN    Faster R-CNN    FPN    FPN + RPN + Fast R-CNN = Faster R..." property='og:description' />
+  <meta content="article" property="og:type" />
+
+<!-- - -->
+
+
+
+
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+          inlineMath: [['$','$']]
+        }
+      });
+    </script> <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML' async></script>
+  </head>
+  <body class="lh-copy dark-gray pa0 f6 sans-serif bg-super-white">
+    <header class="tc mt4">
+      <a href="http://localhost:4000">
+        <img src="http://localhost:4000/images/new.jpg" alt="Home" width="70" height="70" style="border-radius:50%;">
+      </a>
+      <p>Zehui Chen</p>
+    </header>
+    <div class="mw8 bg-white mt4 mb3 center br2-ns bt bb ba-ns b--light-gray" style="max-width: 59rem">
+      <nav class="bb b--light-gray pv4 tc" aria-label="Main">
+        
+          <a class="link link-title blue hover-mid-gray mh2 pv1" style="color: #1d5884 !important; font-size: 13px;"
+             href="http://localhost:4000/about">
+             About
+           </a>
+        
+          <a class="link link-title blue hover-mid-gray mh2 pv1" style="color: #1d5884 !important; font-size: 13px;"
+             href="http://localhost:4000/">
+             Blog
+           </a>
+        
+          <a class="link link-title blue hover-mid-gray mh2 pv1" style="color: #1d5884 !important; font-size: 13px;"
+             href="http://localhost:4000/friends">
+             Friends
+           </a>
+        
+          <a class="link link-title blue hover-mid-gray mh2 pv1" style="color: #1d5884 !important; font-size: 13px;"
+             href="https://github.com/zehuichen123/">
+             Github
+           </a>
+        
+          <a class="link link-title blue hover-mid-gray mh2 pv1" style="color: #1d5884 !important; font-size: 13px;"
+             href="https://drive.google.com/file/d/1KuLvfYPDnHv6cTE2BvoeSg9xbtK7TA2Q/view">
+             Resume
+           </a>
+        
+      </nav>
+
+      <main class="tl f6 relative pa4 pa5-ns overflow-hidden" style="padding-top: 2rem !important; padding-bottom: 2rem">
+        
+          <div class="mb4">
+            <div class="fw600 light-silver mt1">27 Aug 2019</div>
+            <h1 class="ttu f3 mt0 lh-title cb mb2">
+              
+              RCNN series
+            </h1>
+            
+              <!-- <a href="https://twitter.com/share" class="twitter-share-button">Tweet</a>
+              <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+              <div class="fb-like" data-send="false" data-layout="button_count" data-width="100" data-show-faces="false" data-font="arial" data-action="like"></div> -->
+              <!-- Go to www.addthis.com/dashboard to customize your tools --> <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5a57a2d5807d68ea"></script>
+            
+          </div>
+        
+        <div class="markdown-body">
+          <h2 id="outline">Outline</h2>
+
+<blockquote>
+  <p>From R-CNN to Mask RCNN</p>
+
+  <ol>
+    <li>R-CNN</li>
+    <li>Fast R-CNN</li>
+    <li>Faster R-CNN</li>
+    <li>FPN</li>
+    <li>FPN + RPN + Fast R-CNN = Faster R-CNN</li>
+    <li>FPN + RPN + Fast R-CNN + Mask Prediction = Mask R-CNN</li>
+  </ol>
+
+  <p>Mask R-CNN</p>
+
+  <ol>
+    <li>ROI Align
+      <ol>
+        <li>Bilinear interplolation</li>
+        <li>RoI pooling-&gt;RoI align</li>
+      </ol>
+    </li>
+    <li>Loss Function</li>
+    <li>Application</li>
+  </ol>
+</blockquote>
+
+<h2 id="from-r-cnn-to-mask-r-cnn">From R-CNN to Mask R-CNN</h2>
+
+<p>Let’s first go through those methods on how they detect object:</p>
+
+<h3 id="traditional-method">Traditional method</h3>
+
+<p>sliding windows detector. However, brute force approach cost too much time.</p>
+
+<h3 id="r-cnn">R-CNN</h3>
+
+<p><img src="../images/rcnn/rcnn.png" /></p>
+
+<p>Selective Search. Cluster them with colors/ … which have similar features. Then merge these proposals.</p>
+
+<p>Ideas:</p>
+
+<ul>
+  <li>Region proposal: selective search 2000 RoIs</li>
+  <li>Bounding box regression and classification</li>
+</ul>
+
+<p><strong>Bounding Box</strong></p>
+
+<p>Proposal: $P_x, P_y, P_w, P_h$</p>
+
+<p>Ground Truth: $G_x, G_y, G_w, G_h$</p>
+
+<p>Mapping: 
+<script type="math/tex">G_x = P_w d_x(P) + P_x\\
+G_y = P_h d_y(P) + P_y\\
+G_w = P_w \text{exp}(d_w(P))\\
+G_h = P_h \text{exp}(d_h(P))</script>
+The target is to learn parameters: $d_x, d_y, d_w, d_h$.</p>
+
+<hr />
+
+<h3 id="fast-r-cnn">Fast R-CNN</h3>
+
+<p><strong>Apply the region proposal method on the feature maps directly</strong></p>
+
+<p><img src="../images/rcnn/fastrcnn.png" /></p>
+
+<p>Ideas:</p>
+
+<ul>
+  <li>Region proposal from feature maps instead of input image</li>
+  <li>Warp the patches to a fixed size using ROI pooling</li>
+</ul>
+
+<p>Limit: Still use selective search which is time-consuming</p>
+
+<h4 id="roi-pooling">ROI Pooling</h4>
+
+<p><img src="../images/rcnn/roi_pooling.png" /></p>
+
+<p>If we want 2 x 2 max pooling, then the final size of square will not be the same.</p>
+
+<hr />
+
+<h3 id="faster-r-cnn">Faster R-CNN</h3>
+
+<p><img src="../images/rcnn/fasterrcnn.png" /></p>
+
+<p><strong>Replaces the region proposal method by an internal deep network</strong></p>
+
+<p>Ideas: Get region proposals by region proposal network (FPN)</p>
+
+<p>Limit: Only use single scale feature map for detection</p>
+
+<h4 id="rpn">RPN</h4>
+
+<p><img src="../images/rcnn/archor.png" /></p>
+
+<p>Prediction: For each location in feature maps, RPN make k guess.(k anchors).</p>
+
+<p>Training: which object is the anchor responsible for? According to IoU.</p>
+
+<hr />
+
+<h3 id="fpn">FPN</h3>
+
+<p><strong>Faster R-CNN is a sinle sacle object detection and may miss small objects</strong>.</p>
+
+<p><img src="../images/rcnn/fpn.png" /></p>
+
+<p>a) time consuming</p>
+
+<p>b) faster rcnn: single scale object</p>
+
+<p>c) SSD</p>
+
+<p>d) FPN: Accurage location + High semantics</p>
+
+<h4 id="resnet-fpn">ResNet FPN</h4>
+
+<p><img src="../images/rcnn/resnet_fpn.png" /></p>
+
+<p>How to assign RoIs of different scales to the pyramid levels?</p>
+
+<p>$k = [k_0 + log_2(\sqrt{wh}/ 224)]$</p>
+
+<hr />
+
+<h3 id="mask-r-cnn">Mask R-CNN</h3>
+
+<p><img src="../images/rcnn/maskrcnn.png" /></p>
+
+<p><strong>FPN+RPN+Fast R-CNN+Mask Prediction = Mask R-CNN</strong></p>
+
+<p>Backbone: ResNet-FPN</p>
+
+<p>Head: Bounding box regression, classification and Mask prediction</p>
+
+
+        </div>
+        <p class="mt4" style="font-family: 'Sens Serif Pro'">
+  End of Post<br>
+  <span class="silver">at 11:59</span>
+</p>
+<img src="http://localhost:4000/images/scribble3.png" alt="scribble" />
+
+      </main>
+      <section class="fixed-l mw7 center w-100 top-50 tc pb4 nt4" style="max-width: 58rem">
+  
+    <a href="http://localhost:4000/posts/xgboost-explanation" class="no-underline f1 light-blue hover-silver nl5 fl-l ph3">‹</a>
+  
+  
+    <a href="http://localhost:4000/posts/python-parallel-programming" class="no-underline f1 light-blue hover-silver nr5 fr-l ph3">›</a>
+  
+</section>
+    </div>
+    <footer class="mw7 center tc pt3 pb4 silver">
+      Built with Jekyll using <a href="http://github.com/muan/scribble" class="link silver hover-blue pv1">Scribble</a>.
+      <img src="http://localhost:4000/images/scribble2.png" alt="scribble" class="mt4 db center" />
+    </footer>
+  </body>
+</html>
