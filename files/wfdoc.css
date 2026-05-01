@@ -307,3 +307,21 @@ td.pub_td1 img
 table.pub_table tr {
   /*outline: thin dotted #666666;*/
 }
+
+details.pub_group {
+  margin: 0;
+}
+
+details.pub_group summary {
+  color: rgb(82, 123, 189);
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.pub_group_entry {
+  padding: 8px 0 10px 18px;
+}
+
+.pub_group_entry + .pub_group_entry {
+  border-top: 1px solid rgb(238, 238, 238);
+}
